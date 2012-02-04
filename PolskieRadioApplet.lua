@@ -19,6 +19,7 @@ local io                     = require("io")
 local SocketHttp             = require("jive.net.SocketHttp")
 local RequestHttp            = require("jive.net.RequestHttp")
 local json                   = require("json")
+local math                   = require("math")
 
 local Applet                 = require("jive.Applet")
 local System                 = require("jive.System")
@@ -37,6 +38,7 @@ local JIVE_VERSION           = jive.JIVE_VERSION
 
 local debug                  = require("jive.utils.debug")
 local appletManager          = appletManager
+local jiveMain               = jiveMain
 
 local CHANNELS_HOST = "moje.polskieradio.pl"
 local CHANNELS_QUERY = "api/?key=20439fdf-be66-4852-9ded-1476873cfa22&output=json"
@@ -57,6 +59,19 @@ local function _channelStreamUrl(channel)
 		end
 	end
 	return nil
+end
+
+local function _getIconSink(icon)
+	local iconSink = icon:sink()
+	return function(chunk, err)
+		if iconSink(chunk, err) then
+			local prefSize = jiveMain:getSkinParam('THUMB_SIZE')
+			local image = icon:getImage()
+			local imageWidth,imageHeight = image:getSize()
+			local shrinkFactor = math.max(imageWidth,imageHeight) / prefSize
+			icon:setValue( image:shrink(shrinkFactor,shrinkFactor) )
+		end
+	end
 end
 
 module(..., Framework.constants)
@@ -99,7 +114,7 @@ function show(self, menuItem)
 				}
 
 				if newMenuItem.stream then
-					local req = RequestHttp(newMenuItem.icon:sink(), 'GET', channel.image )
+					local req = RequestHttp(_getIconSink(newMenuItem.icon), 'GET', channel.image )
 					local uri = req:getURI()
 					local http = SocketHttp(jnt, uri.host, uri.port, uri.host)
 					http:fetch(req)
