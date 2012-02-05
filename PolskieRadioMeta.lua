@@ -12,6 +12,9 @@
 local oo            = require("loop.simple")
 
 local AppletMeta    = require("jive.AppletMeta")
+local Icon          = require("jive.ui.Icon")
+local Surface       = require("jive.ui.Surface")
+local math          = require("math")
 
 local appletManager = appletManager
 local jiveMain      = jiveMain
@@ -28,6 +31,22 @@ end
 
 function registerApplet(meta)
 	jnt:subscribe(meta)
-	meta.menu = meta:menuItem('PolskieRadio', 'home', 'POLISH_RADIO', function(applet, ...) applet:show(...) end)
+
+	local icon = Icon("icon")
+	-- use the checkSkin function to load the icon image on first call
+	local cs = icon.checkSkin
+	icon.checkSkin = function(...)
+		local prefSize = jiveMain:getSkinParam('THUMB_SIZE')
+		local image = Surface:loadImage("applets/PolskieRadio/logo.png")
+		local imageWidth,imageHeight = image:getSize()
+		local shrinkFactor = math.max(imageWidth,imageHeight) / prefSize
+		image = image:shrink(shrinkFactor, shrinkFactor)
+		icon:setValue(image)
+		cs(...)
+		-- replace with original
+		icon.checkSkin = cs
+	end
+	meta.menu = meta:menuItem('PolskieRadio', 'home', 'POLISH_RADIO',
+			function(applet, ...) applet:show(...) end, nil, { icon = icon } )
 	jiveMain:addItem(meta.menu)
 end
