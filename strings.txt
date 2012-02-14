@@ -2,6 +2,11 @@
 # The two letter codes are defined by ISO 639-1
 # http://en.wikipedia.org/wiki/List_of_ISO_639_codes
 
+PODCASTS
+	CS	Pořady
+	EN	Podcasts
+	PL	Audycje
+
 POLISH_RADIO
 	CS	Polský rozhlas
 	EN	Polish Radio
