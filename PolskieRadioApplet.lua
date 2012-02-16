@@ -9,12 +9,12 @@
 -------------------------------------------------------------------------------
 
 -- stuff we use
-local assert, getmetatable, ipairs, pairs, pcall, setmetatable, tonumber, tostring = assert, getmetatable, ipairs, pairs, pcall, setmetatable, tonumber, tostring
+local assert, ipairs, pairs, type = assert, ipairs, pairs, type
 
 local oo                     = require("loop.simple")
 
 local json                   = require("json")
-local lxp                    = require("lxp")
+local lom                    = require("lxp.lom")
 
 local Applet                 = require("jive.Applet")
 local SocketHttp             = require("jive.net.SocketHttp")
@@ -210,7 +210,31 @@ function showPodcastContent(self, menuItem, feed)
 		if err then
 			log:error( err )
 		elseif chunk then
-			log:info(chunk)
+			local rss = lom.parse( chunk )
+			for _, entry in ipairs(rss) do
+				if type(entry) == 'table' and entry.tag == 'channel' then
+					for _, channelEntry in ipairs(entry) do
+						if type(channelEntry) == 'table' and channelEntry.tag == 'item' then
+							local newMenuItem = {
+								callback = _streamCallback,
+								style = 'item_choice'
+							}
+
+							for _,itemEntry in ipairs(channelEntry) do
+								if type(itemEntry) == 'table' and itemEntry.tag == 'link' then
+									newMenuItem.stream = itemEntry[1]
+								elseif type(itemEntry) == 'table' and itemEntry.tag == 'title' then
+									newMenuItem.text = itemEntry[1]
+								end
+							end
+
+							if newMenuItem.stream and newMenuItem.text then
+								menu:addItem( newMenuItem )
+							end
+						end
+					end
+				end
+			end
 		end
 	end
 
