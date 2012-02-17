@@ -221,8 +221,8 @@ function showPodcastContent(self, menuItem, feed)
 							}
 
 							for _,itemEntry in ipairs(channelEntry) do
-								if type(itemEntry) == 'table' and itemEntry.tag == 'link' then
-									newMenuItem.stream = itemEntry[1]
+								if type(itemEntry) == 'table' and itemEntry.tag == 'enclosure' then
+									newMenuItem.stream = itemEntry.attr.url
 								elseif type(itemEntry) == 'table' and itemEntry.tag == 'title' then
 									newMenuItem.text = itemEntry[1]
 								end
