@@ -46,7 +46,7 @@ function registerApplet(meta)
 		-- replace with original
 		icon.checkSkin = cs
 	end
-	meta.menu = meta:menuItem('PolskieRadio', 'home', 'POLISH_RADIO',
+	meta.menu = meta:menuItem('PolskieRadio', 'extras', 'POLISH_RADIO',
 			function(applet, ...) applet:show(...) end, nil, { icon = icon } )
 	jiveMain:addItem(meta.menu)
 end
