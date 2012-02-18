@@ -179,6 +179,7 @@ function showCategoryItems(self, menuItem, subItems)
 
 	local window = Window("text_list", menuItem.text)
 	local menu = SimpleMenu("menu")
+	menu:setComparator(menu.itemComparatorAlpha)
 	menu:setItems(subItems)
 	window:addWidget(menu)
 
@@ -190,6 +191,7 @@ function showPodcastList(self, menuItem)
 
 	local window = Window("text_list", menuItem.text)
 	local menu = SimpleMenu("menu")
+	menu:setComparator(menu.itemComparatorAlpha)
 	window:addWidget(menu)
 
 	for _,feed in pairs(PODCAST_FEEDS) do
