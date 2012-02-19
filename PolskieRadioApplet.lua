@@ -23,6 +23,7 @@ local Framework              = require("jive.ui.Framework")
 local Icon                   = require("jive.ui.Icon")
 local Window                 = require("jive.ui.Window")
 local SimpleMenu             = require("jive.ui.SimpleMenu")
+local Textarea               = require("jive.ui.Textarea")
 local debug                  = require("jive.utils.debug")
 local Player                 = require("jive.slim.Player")
 
@@ -112,10 +113,18 @@ function show(self, menuItem)
 	local menu = SimpleMenu("menu")
 	window:addWidget(menu)
 
+	local podcastsMenuItem = {
+		text = self:string("PODCASTS"),
+		callback = function(event,menuItem) self:showPodcastList( menuItem ) end
+	}
+
 	local function sink(chunk, err)
 		if err then
-			log:error( err )
+			log:warn( err )
 			previousMenu:unlock()
+			menu:setHeaderWidget( Textarea( "help_text", self:string('CHANNEL_LIST_ERROR', err) ) )
+			menu:addItem( podcastsMenuItem )
+			self:tieAndShowWindow(window)
 		elseif chunk then
 			local cat2Menus = {}
 			local channels = json.decode(chunk).channel
@@ -149,7 +158,7 @@ function show(self, menuItem)
 				menu:addItem( { text = category, callback = function(event,menuItem) self:showCategoryItems(menuItem,subItems) end } )
 			end
 
-			menu:addItem( { text = self:string("PODCASTS"), callback = function(event,menuItem) self:showPodcastList( menuItem ) end } )
+			menu:addItem( podcastsMenuItem )
 			self:tieAndShowWindow(window)
 			previousMenu:unlock()
 		end
@@ -200,8 +209,10 @@ function showPodcastContent(self, previousMenu, menuItem, feed)
 
 	local function sink(chunk, err)
 		if err then
-			log:error( err )
+			log:warn( err )
 			previousMenu:unlock()
+			menu:setHeaderWidget( Textarea( "help_text", self:string('PODCAST_LIST_ERROR', err) ) )
+			self:tieAndShowWindow(window)
 		elseif chunk then
 			local rss = lom.parse( chunk )
 			for _, entry in ipairs(rss) do

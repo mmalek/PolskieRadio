@@ -11,3 +11,11 @@ POLISH_RADIO
 	CS	Polský rozhlas
 	EN	Polish Radio
 	PL	Polskie Radio
+
+CHANNEL_LIST_ERROR
+	EN	Cannot load channel list: %s
+	PL	Błąd podczas pobierania listy kanałów: %s
+
+PODCAST_LIST_ERROR
+	EN	Cannot load podcast list: %s
+	PL	Błąd podczas pobierania listy audycji: %s
