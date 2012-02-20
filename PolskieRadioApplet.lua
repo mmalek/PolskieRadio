@@ -73,12 +73,16 @@ local PODCAST_FEEDS = {
 }
 
 local _streamCallback = function(event, menuItem)
-	local action = event:getType() == ACTION and event:getAction() or event:getType() == EVENT_ACTION and "play"
 	local player = Player:getLocalPlayer()
 	local server = player:getSlimServer()
 	server:userRequest(nil,	player:getId(), { "playlist", "play", menuItem.stream, menuItem.text })
-
 	appletManager:callService('goNowPlaying', Window.transitionPushLeft, false)
+end
+
+local _streamContextMenuCallback = function(menuItem, applet)
+	local player = Player:getLocalPlayer()
+	local server = player:getSlimServer()
+	server:userRequest(nil,	player:getId(), { "playlist", "add", menuItem.stream, menuItem.text })
 end
 
 local function _channelStreamUrl(channel)
@@ -135,6 +139,7 @@ function show(self, menuItem)
 					text = channel.title,
 					icon = Icon("icon"),
 					callback = _streamCallback,
+					cmCallback = function(event, menuItem) _streamContextMenuCallback(menuItem, self) end,
 					stream = _channelStreamUrl(channel),
 					style = 'item_choice'
 				}
@@ -221,6 +226,7 @@ function showPodcastContent(self, previousMenu, menuItem, feed)
 						if type(channelEntry) == 'table' and channelEntry.tag == 'item' then
 							local newMenuItem = {
 								callback = _streamCallback,
+								cmCallback = function(event, menuItem) _streamContextMenuCallback(menuItem, self) end,
 								style = 'item_choice'
 							}
 
