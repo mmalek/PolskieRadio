@@ -87,7 +87,7 @@ end
 
 local function _channelStreamUrl(channel)
 	for i,stream in ipairs(channel.AlternateStationsStreams) do
-		if stream.name == "MP3-AAC" then
+		if stream.name == "mp3" then
 			return stream.link
 		end
 	end
