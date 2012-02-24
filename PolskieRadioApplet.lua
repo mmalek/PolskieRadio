@@ -94,23 +94,13 @@ local function _channelStreamUrl(channel)
 	return nil
 end
 
-local function _getIconSink(icon)
-	local iconSink = icon:sink()
-	return function(chunk, err)
-		if iconSink(chunk, err) then
-			local prefSize = jiveMain:getSkinParam('THUMB_SIZE')
-			local image = icon:getImage()
-			local imageWidth,imageHeight = image:getSize()
-			local shrinkFactor = math.max(imageWidth,imageHeight) / prefSize
-			icon:setValue( image:shrink(shrinkFactor,shrinkFactor) )
-		end
-	end
-end
-
 module(..., Framework.constants)
 oo.class(_M, Applet)
 
 function show(self, menuItem)
+
+	local player = Player:getLocalPlayer()
+	self.server = player:getSlimServer()
 
 	local previousMenu = jiveMain:getNodeMenu( menuItem.node )
 	local window = Window("text_list", menuItem.text)
@@ -145,10 +135,7 @@ function show(self, menuItem)
 				}
 
 				if newMenuItem.stream then
-					local req = RequestHttp(_getIconSink(newMenuItem.icon), 'GET', channel.image )
-					local uri = req:getURI()
-					local http = SocketHttp(jnt, uri.host, uri.port, uri.host)
-					http:fetch(req)
+					self.server:fetchArtwork( channel.image, newMenuItem.icon, jiveMain:getSkinParam('THUMB_SIZE'), 'png' )
 
 					local menuItems = cat2Menus[channel.category]
 					if menuItems == nil then
